@@ -1,0 +1,15 @@
+name: SupremeVouchers
+version: '$version'
+main: net.scape.project.supremeVouchers.SupremeVouchers
+api-version: '1.13'
+load: STARTUP
+authors: [ Scape ]
+description: All in one Voucher plugin!
+folia-supported: true
+commands:
+  voucher:
+    description: Voucher management command
+    usage: /voucher <subcommand>
+    aliases:
+      - vouchers
+      - supremevouchers

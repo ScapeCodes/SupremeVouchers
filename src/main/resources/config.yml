@@ -1,0 +1,91 @@
+############################################################
+# +------------------------------------------------------+ #
+# |                      Settings                        | #
+# +------------------------------------------------------+ #
+############################################################
+
+settings:
+  delay: 3 # cooldown before another voucher can be redeemed
+  block-in-offhand: true # prevent redeeming from offhand
+  block-in-anvil: true # prevent using vouchers in anvils
+  block-in-grindstone: true # prevent using vouchers in grindstones
+  block-in-enchanter: true # prevent using vouchers in enchantment tables
+  block-in-crafting: true # disallow vouchers as crafting ingredients
+  restrict-worlds: # restricts what worlds prevent redeeming.
+    - 'exampleworld1'
+    - 'exampleworld2'
+  permission-required: false # require permission to redeem
+  permission: "voucher.redeem"
+  voucher-list-menu: true # set false to disable the voucher main menu.
+
+############################################################
+# +------------------------------------------------------+ #
+# |                      Messages                        | #
+# +------------------------------------------------------+ #
+############################################################
+
+messages:
+  prefix: "&a&lVouchers &8●"
+  no-world: "%prefix% &cYou cannot use vouchers in this world."
+  cooldown: "%prefix% &cYou must wait before redeeming another voucher."
+  anvil-block: "%prefix% &cYou cannot use vouchers in an anvil."
+  grindstone-block: "%prefix% &cYou cannot use vouchers in a grindstone."
+  enchanter-block: "%prefix% &cYou cannot use vouchers in an enchanting table."
+  crafting-block: "%prefix% &cYou cannot use vouchers as crafting ingredients."
+  move-block: "%prefix% &cYou cannot move vouchers into this inventory."
+  teleport-invalid-format: "%prefix% &cInvalid teleport format in voucher: &e%input%"
+  teleport-world-not-found: "%prefix% &cWorld '%world%' not found."
+  voucher-updated: '%prefix% &7Data Updated!'
+  input:
+    suggest-new-input: "&aType a new value for %id%:"
+    suggest-cancel: "&8(Type 'Cancel' to stop)"
+    cancelled: "%prefix% &cEdit cancelled."
+    invalid-input: "%prefix% &cInvalid input! Please try again."
+    invalid-action: "&cInvalid action format! Actions must start with one of:"
+    invalid-action-prefix: "&e- %action-prefix%"
+  errors:
+    no-permission: "%prefix% &cYou do not have permission to use this command!"
+    unknown-command: "%prefix% &cUnknown argument! Usage: &7/voucher"
+    player-not-found: "%prefix% &cPlayer &e%player% &cis not online!"
+    voucher-exists: "%prefix% &cA voucher with ID &e%id% &calready exists!"
+    voucher-not-found: "%prefix% &cVoucher with ID &e%id% &cdoes not exist!"
+    no-vouchers-available: "%prefix% &cThere are no vouchers available!"
+    must-be-player: "%prefix% &cOnly players may use this command!"
+    usage-create: "%prefix% &cUsage: &7/voucher create <id>"
+    usage-give: "%prefix% &cUsage: &7/voucher give <player> <id>"
+    usage-giveall: "%prefix% &cUsage: &7/voucher giveall <id></gray>"
+    usage-giverandom: "%prefix% &cUsage: &7/voucher giverandom <player>"
+    usage-edit: "%prefix% &cUsage: &7/voucher edit <id>"
+    usage-delete: "%prefix% &cUsage: &7/voucher delete <id>"
+  success:
+    voucher-created: "%prefix% &7Voucher &e%id% &7created successfully!"
+    voucher-given: "%prefix% &7Voucher &e%id% &7given to &e%player%&a!"
+    random-voucher-given: "%prefix% &8Random voucher &e%id% &8given to &e%player%&7!"
+    voucher-deleted: "%prefix% &cVoucher &e%id% &cdeleted!"
+    vouchers-reloaded: "%prefix% &7Vouchers reloaded from config!"
+  help:
+    main:
+      - "&aVoucher Commands:"
+      - "&8● &7/voucher give <player> <id>"
+      - "&8● &7/voucher giveall <id>"
+      - "&8● &7/voucher giverandom <player>"
+      - "&8● &7/voucher create <id>"
+      - "&8● &7/voucher delete <id>"
+      - "&8● &7/voucher reload"
+      - "&8● &7/voucher list"
+      - "&8● &7/voucher edit <id>"
+      - "&8● &7/voucher merge"
+  list:
+    header: "&a&lVouchers &7(%amount% total) &f- Page &a%page%&7/&a%maxpage%"
+    next: "&b[Next ▶]"
+    back: "&7[◀ Back]"
+    voucher-name-color: "&7"
+    give:
+      text: "&a[➕]"
+      hover: "&7Give yourself &e%id%"
+    edit:
+      text: "&e[✎]"
+      hover: "&7Edit voucher &e%id%"
+    delete:
+      text: "&c[✖]"
+      hover: "&cDelete voucher &e%id% &c(IRREVERSIBLE)"

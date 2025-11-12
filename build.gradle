@@ -1,0 +1,121 @@
+plugins {
+    id 'java'
+    id("xyz.jpenilla.run-paper") version "2.3.1"
+}
+
+sourceCompatibility = 21
+targetCompatibility = 21
+group = 'net.scape.project'
+version = '1.0.4'
+
+java {
+    disableAutoTargetJvm()
+}
+
+repositories {
+    mavenCentral()
+
+    maven { url 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
+    maven { url 'https://repo.opencollab.dev/maven-snapshots/' }
+    maven { url "https://repo.codemc.org/repository/maven-public/" }
+    maven { url "https://repo.codemc.org/repository/maven-snapshots/" }
+    maven { url 'https://repo.codemc.io/repository/creatorfromhell/' }
+    maven { url 'https://jitpack.io' }
+    maven { url 'https://libraries.minecraft.net/' }
+    maven { url 'https://repo1.maven.org/maven2/' }
+    maven { url 'https://repo.rosewooddev.io/repository/public/' }
+    maven { url 'https://repo.papermc.io/repository/maven-public/' }
+    maven { url 'https://repo.nexomc.com/releases/' }
+    maven { url 'https://repo.nexomc.com/snapshots' }
+    maven { url 'https://repo.oraxen.com/releases' }
+    maven { url "https://repo.oraxen.com/releases" }
+    maven { url "https://repo.nightexpressdev.com/releases" }
+    maven { url "https://repo.dmulloy2.net/repository/public/" }
+    maven {
+        name "essentialsx-releases"
+        url "https://repo.essentialsx.net/releases/"
+    }
+    maven { url "https://repo.alessiodp.com/releases/" }
+    maven { url = "https://repo.lushplugins.org/releases/" }
+    maven {
+        url = "https://repo.artillex-studios.com/releases/"
+    }
+}
+
+configurations.all {
+    resolutionStrategy {
+        force 'io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT'
+        eachDependency {
+            if (requested.group == 'org.spigotmc' && requested.name == 'spigot-api') {
+                useTarget 'io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT'
+                because 'Force resolution to match Paper 1.21.10 API'
+            }
+        }
+    }
+}
+
+configurations {
+    shade
+    compileOnly.extendsFrom(shade)
+}
+
+dependencies {
+    compileOnly 'io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT'
+
+    compileOnly 'me.clip:placeholderapi:2.11.6'
+    compileOnly 'net.milkbowl.vault:VaultUnlockedAPI:2.11'
+
+    compileOnly 'com.github.LoneDev6:itemsadder-api:3.6.3-beta-14'
+    compileOnly 'com.arcaniax:HeadDatabase-API:1.3.2'
+    compileOnly 'com.nexomc:nexo:1.6.0'
+    compileOnly 'io.th0rgal:oraxen:1.190.0'
+    compileOnly 'io.github.valerashimchuck:simpleitemgenerator-api:1.5.0'
+
+    compileOnly 'de.tr7zw:item-nbt-api-plugin:2.15.3'
+
+    shade "net.kyori:adventure-text-minimessage:4.25.0"
+    shade 'com.github.cryptomorin:XSeries:13.5.1'
+    shade 'com.artillexstudios.axapi:axapi:1.4.802:all'
+}
+
+processResources {
+    def props = [
+            version: project.version,
+            name: project.name
+    ]
+    inputs.properties props
+    filteringCharset 'UTF-8'
+    filesMatching('plugin.yml') {
+        expand props
+    }
+}
+
+def devBuild = project.hasProperty('dev') && project.property('dev').toBoolean()
+def devBuildVersion = project.findProperty('devBuildVersion') ?: 'SNAPSHOT'
+
+jar {
+    archiveBaseName.set("SupremeVouchers")
+
+    if (devBuild) {
+        archiveVersion.set("${project.version}-DEV-${devBuildVersion}")
+    } else {
+        archiveVersion.set(project.version.toString())
+    }
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    manifest {
+        attributes(
+                'Main-Class': 'net.scape.project.supremeVouchers.SupremeVouchers',
+                'Implementation-Title': 'SupremeVouchers',
+                'Implementation-Version': project.version.toString()
+        )
+    }
+
+    // Include shaded dependencies
+    from {
+        configurations.shade.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+
+    exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
+}
