@@ -1,15 +1,16 @@
 plugins {
     id 'java'
     id("xyz.jpenilla.run-paper") version "2.3.1"
+	id("com.gradleup.shadow") version "8.3.3"
 }
 
-sourceCompatibility = 21
-targetCompatibility = 21
 group = 'net.scape.project'
 version = '1.0.5'
 
 java {
     disableAutoTargetJvm()
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 repositories {
@@ -54,11 +55,6 @@ configurations.all {
     }
 }
 
-configurations {
-    shade
-    compileOnly.extendsFrom(shade)
-}
-
 dependencies {
     compileOnly 'io.papermc.paper:paper-api:1.21.10-R0.1-SNAPSHOT'
 
@@ -75,9 +71,9 @@ dependencies {
 
     compileOnly 'me.chancesd.pvpmanager:pvpmanager:4.0.7'
 
-    shade "net.kyori:adventure-text-minimessage:4.25.0"
-    shade 'com.github.cryptomorin:XSeries:13.5.1'
-    shade 'com.artillexstudios.axapi:axapi:1.4.802:all'
+    implementation "net.kyori:adventure-text-minimessage:4.25.0"
+    implementation 'com.github.cryptomorin:XSeries:13.5.1'
+    implementation 'com.artillexstudios.axapi:axapi:1.4.802:all'
 }
 
 processResources {
@@ -92,32 +88,49 @@ processResources {
     }
 }
 
-def devBuild = project.hasProperty('dev') && project.property('dev').toBoolean()
-def devBuildVersion = project.findProperty('devBuildVersion') ?: 'SNAPSHOT'
-
-jar {
+shadowJar {
     archiveBaseName.set("SupremeVouchers")
+    archiveClassifier.set("")
 
-    if (devBuild) {
+    // Relocations - critical to avoid conflicts with other plugins!
+
+    relocate 'net.kyori.adventure', 'net.scape.project.shaded.kyori.adventure'
+    relocate 'net.kyori.examination', 'net.scape.project.shaded.kyori.examination'
+    relocate 'net.kyori.option', 'net.scape.project.shaded.kyori.option'
+
+    relocate 'com.cryptomorin.xseries', 'net.scape.project.shaded.xseries'
+
+    relocate 'com.artillexstudios', 'net.scape.project.shaded.axapi'
+    relocate 'revxrsal', 'net.scape.project.shaded.axapi.revxrsal'
+
+    mergeServiceFiles()
+
+    minimize()
+
+    exclude 'META-INF/*.SF'
+    exclude 'META-INF/*.DSA'
+    exclude 'META-INF/*.RSA'
+
+    if (project.hasProperty('dev')) {
+        def devBuildVersion = project.findProperty('devBuildVersion') ?: 'SNAPSHOT'
         archiveVersion.set("${project.version}-DEV-${devBuildVersion}")
     } else {
         archiveVersion.set(project.version.toString())
     }
 
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-
     manifest {
         attributes(
-                'Main-Class': 'net.scape.project.supremeVouchers.SupremeVouchers',
-                'Implementation-Title': 'SupremeVouchers',
-                'Implementation-Version': project.version.toString()
+            'Main-Class': 'net.scape.project.supremeVouchers.SupremeVouchers',
+            'Implementation-Title': 'SupremeVouchers',
+            'Implementation-Version': project.version.toString()
         )
     }
+}
 
-    // Include shaded dependencies
-    from {
-        configurations.shade.collect { it.isDirectory() ? it : zipTree(it) }
-    }
+tasks.build {
+    dependsOn shadowJar
+}
 
-    exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
+tasks.jar {
+    enabled = false
 }

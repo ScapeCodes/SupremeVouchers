@@ -42,8 +42,18 @@ public class VoucherListener implements Listener {
     public void onVoucherUse(PlayerInteractEvent event) {
         Player player = event.getPlayer();
 
-        if (event.getHand() == EquipmentSlot.OFF_HAND && config.getBoolean("settings.block-in-offhand", true)) {
-            return;
+        // On legacy versions (like 1.8), PlayerInteractEvent#getHand() does not exist.
+        // Use reflection to access it when available, otherwise assume main hand.
+        try {
+            java.lang.reflect.Method getHandMethod = event.getClass().getMethod("getHand");
+            Object hand = getHandMethod.invoke(event);
+            if (hand == EquipmentSlot.OFF_HAND && config.getBoolean("settings.block-in-offhand", true)) {
+                return;
+            }
+        } catch (NoSuchMethodException ignored) {
+            // getHand() not present – this is a legacy server version without offhand support.
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
 
         if (!(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
@@ -51,7 +61,7 @@ public class VoucherListener implements Listener {
         }
 
         ItemStack item = event.getItem();
-        if (item == null || item.getType().isAir() || item.getAmount() <= 0) return;
+        if (item == null || item.getType() == org.bukkit.Material.AIR || item.getAmount() <= 0) return;
 
         NBTItem nbt = new NBTItem(item);
         if (!nbt.hasNBTData() || !nbt.hasTag("voucherId")) return;
@@ -217,7 +227,7 @@ public class VoucherListener implements Listener {
         if (!(clicker instanceof Player player)) return;
 
         ItemStack current = event.getCurrentItem();
-        if (current == null || current.getType().isAir()) return;
+        if (current == null || current.getType() == org.bukkit.Material.AIR) return;
 
         NBTItem nbt = new NBTItem(current);
         if (!nbt.hasNBTData() || !nbt.hasTag("voucherId")) return;
@@ -268,7 +278,7 @@ public class VoucherListener implements Listener {
     @EventHandler
     public void onVoucherHopperMove(InventoryMoveItemEvent event) {
         ItemStack item = event.getItem();
-        if (item == null || item.getType().isAir()) return;
+        if (item == null || item.getType() == org.bukkit.Material.AIR) return;
 
         NBTItem nbt = new NBTItem(item);
         if (!nbt.hasNBTData() || !nbt.hasTag("voucherId")) return;
@@ -279,7 +289,7 @@ public class VoucherListener implements Listener {
     @EventHandler
     public void onVoucherCreativeMiddleClick(InventoryCreativeEvent event) {
         ItemStack item = event.getCursor();
-        if (item == null || item.getType().isAir()) return;
+        if (item == null || item.getType() == org.bukkit.Material.AIR) return;
 
         NBTItem nbt = new NBTItem(item);
         if (!nbt.hasNBTData() || !nbt.hasTag("voucherId")) return;

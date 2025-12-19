@@ -121,7 +121,20 @@ public class ItemBuilder {
     }
 
     public ItemBuilder hideTooltip(boolean hide) {
-        meta.setHideTooltip(hide);
+        if (meta == null) return this;
+
+        // Use reflection so the plugin works on both legacy (1.8+) and modern servers.
+        // setHideTooltip(boolean) only exists on newer Bukkit versions; calling it
+        // directly on older versions (like 1.8) would cause NoSuchMethodError.
+        try {
+            java.lang.reflect.Method m = meta.getClass().getMethod("setHideTooltip", boolean.class);
+            m.invoke(meta, hide);
+        } catch (NoSuchMethodException ignored) {
+            // API not available on this server version – silently ignore.
+        } catch (Exception ex) {
+            // Any other reflective issue should not break voucher giving.
+            ex.printStackTrace();
+        }
         return this;
     }
 
@@ -129,10 +142,6 @@ public class ItemBuilder {
         meta.setUnbreakable(unbreakable);
         return this;
     }
-
-    // --------------------------
-    // ✅ Corrected NBT handling
-    // --------------------------
 
     public ItemBuilder setNBT(String key, String value) {
         NBTItem nbt = new NBTItem(build()); // build to ensure latest meta
