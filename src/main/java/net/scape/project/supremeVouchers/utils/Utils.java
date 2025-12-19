@@ -33,7 +33,6 @@ public class Utils {
     private static final Pattern GRADIENT_PATTERN =
             Pattern.compile("<gradient:(#[A-Fa-f0-9]{6}):(#[A-Fa-f0-9]{6})>(.*?)</gradient>");
 
-
     private static final Pattern FORMAT_TAG_PATTERN =
             Pattern.compile("<(bold|italic|underlined|strikethrough|obfuscated)>");
     private static final Pattern FORMAT_CLOSE_PATTERN =

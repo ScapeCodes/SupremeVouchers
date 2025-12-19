@@ -1,5 +1,6 @@
 package net.scape.project.supremeVouchers.managers;
 
+import com.cryptomorin.xseries.XEnchantment;
 import net.scape.project.supremeVouchers.SupremeVouchers;
 import net.scape.project.supremeVouchers.objects.Voucher;
 import net.scape.project.supremeVouchers.objects.VoucherOptions;
@@ -97,8 +98,10 @@ public class VoucherManager {
                 List<String> allowedWorlds = Collections.emptyList();
                 String allowedWorldsMessage = "";
 
-                if (properties != null) {
+                boolean combat_activation = false;
+                String combat_activation_message = "";
 
+                if (properties != null) {
                     ConfigurationSection confirm = properties.getConfigurationSection("confirm-use");
                     if (confirm != null) {
                         confirmUseEnable = confirm.getBoolean("enable", false);
@@ -111,6 +114,12 @@ public class VoucherManager {
                         allowedWorldsMessage = worlds.getString("message", "<red>You cannot use this voucher here!");
                         allowedWorlds = worlds.getStringList("worlds");
                     }
+
+                    ConfigurationSection combat = properties.getConfigurationSection("combat-activation");
+                    if (combat != null) {
+                        combat_activation = combat.getBoolean("enable", false);
+                        combat_activation_message = combat.getString("message", "&c&lHey! &cYou cannot not redeem a voucher in combat mode.");
+                    }
                 }
 
                 VoucherOptions options = new VoucherOptions(
@@ -118,7 +127,9 @@ public class VoucherManager {
                         confirmUseMessage,
                         allowedWorldsEnable,
                         allowedWorlds,
-                        allowedWorldsMessage
+                        allowedWorldsMessage,
+                        combat_activation,
+                        combat_activation_message
                 );
 
                 Voucher voucher = new Voucher(
@@ -171,6 +182,10 @@ public class VoucherManager {
             worlds.set("enable", v.getOptions().isAllowed_worlds_enable());
             worlds.set("message", v.getOptions().getAllowed_worlds_message());
             worlds.set("worlds", v.getOptions().getAllowed_worlds());
+
+            ConfigurationSection combat = props.createSection("combat-activation");
+            combat.set("enable", v.getOptions().isCombatActivation());
+            combat.set("message", v.getOptions().getCombatActivationMessage());
         }
 
         saveVouchersFile();
@@ -209,7 +224,7 @@ public class VoucherManager {
                 .setLore(lore.toArray(new String[0]))
                 .setAmount(voucher.getItemAmount())
                 .setCustomModelData(voucher.getCustomModelData())
-                .addEnchant(Enchantment.UNBREAKING, 1, true)
+                .addEnchant(XEnchantment.UNBREAKING.get(), 1, true)
                 .addItemFlags(ItemFlag.HIDE_ENCHANTS)
                 .hideTooltip(voucher.isHideToolbar())
                 .setNBT("voucherId", voucher.getId())
@@ -229,7 +244,9 @@ public class VoucherManager {
                 "&a&lHey! &7Are you sure you want to use this voucher? Right-Click again...",
                 false,
                 new ArrayList<>(),
-                "&c&lHey! <red>You are not in any of the whitelisted worlds."
+                "&c&lHey! &cYou are not in any of the whitelisted worlds.",
+                false,
+                "&c&lHey! &cYou cannot not redeem a voucher in combat mode."
         );
 
         List<String> actions = new ArrayList<>();

@@ -44,6 +44,9 @@ vouchers:
         worlds:
           - 'world'
           - 'world_nether'
+      combat-activation: # supports: pvpmanager
+        enable: true
+        message: '&c&lHey! &cYou cannot not redeem a voucher in combat mode.'
   starter_kit:
     description: "Gives the player a starter kit"
     actions:
@@ -74,3 +77,6 @@ vouchers:
         worlds:
           - 'world'
           - 'world_nether'
+      combat-activation: # supports: pvpmanager
+        enable: true
+        message: '&c&lHey! &cYou cannot not redeem a voucher in combat mode.'

@@ -156,7 +156,9 @@ public class MergeManager {
                         confirmUseMessage,
                         allowedWorldsEnable,
                         allowedWorlds,
-                        allowedWorldsMessage
+                        allowedWorldsMessage,
+                        false,
+                        "&c&lHey! &cYou cannot not redeem a voucher in combat mode."
                 );
 
                 /* ---------------------------------------------------------

@@ -1,10 +1,13 @@
 package net.scape.project.supremeVouchers.listeners;
 
 import de.tr7zw.nbtapi.NBTItem;
+import me.chancesd.pvpmanager.PvPManager;
+import me.chancesd.pvpmanager.player.CombatPlayer;
 import net.scape.project.supremeVouchers.SupremeVouchers;
 import net.scape.project.supremeVouchers.managers.VoucherManager;
 import net.scape.project.supremeVouchers.objects.Voucher;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -62,6 +65,22 @@ public class VoucherListener implements Listener {
 
             if (isNotInAllowedWorld) {
                 msgPlayer(player, voucher.getOptions().getAllowed_worlds_message());
+                return;
+            }
+        }
+
+        if (voucher.getOptions().isCombatActivation()) {
+            PvPManager pvpmanager = null;
+
+            if (Bukkit.getPluginManager().isPluginEnabled("PvPManager"))
+                pvpmanager = (PvPManager) Bukkit.getPluginManager().getPlugin("PvPManager");
+            if (pvpmanager == null)
+                return;
+
+            CombatPlayer combatPlayer = pvpmanager.getPlayerManager().get(player);
+
+            if (combatPlayer.isInCombat()) {
+                msgPlayer(player, voucher.getOptions().getCombatActivationMessage());
                 return;
             }
         }
@@ -174,7 +193,7 @@ public class VoucherListener implements Listener {
                         continue;
                     }
 
-                    var target = new org.bukkit.Location(world, x, y, z, yaw, pitch);
+                    var target = new Location(world, x, y, z, yaw, pitch);
                     player.teleport(target);
 
 //                    player.sendMessage(msgConfig("teleport-success", Map.of(
